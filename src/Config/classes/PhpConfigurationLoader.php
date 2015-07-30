@@ -5,7 +5,7 @@
  *
  * @author mushu_000
  */
-class PhpConfigurationLoader {
+class PhpConfigurationLoader implements IConfigurationLoader {
 
     /**
      * {@inheritdoc}

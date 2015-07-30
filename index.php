@@ -1,73 +1,64 @@
 <?php
-
 require_once 'config.inc.php';
 
-interface IBaseController {
-
-    public function action($a);
+interface IController {
+    
 }
 
-class Controller implements IBaseController {
-
-    public function action($a) {
-        return 'defaultAction';
+class Controller implements IController {
+    
+    public function get() {
+        return 'Hello, мир!';
     }
-
 }
 
-class UserController implements IBaseController {
+class AController implements IController {
 
-    public function action($a) {
-        return 'userAction';
+    public function get() {
+        return 'Pathc';
     }
-
 }
 
-// echo Application::me()->bind(IBaseController::class, UserController::class)
-//     ->get(IBaseController::class)
-//     ->action(1) . PHP_EOL;
+class MyMarker extends Marker {
+    
+    public function get() {
+        return "My Marker";
+    }
+    
+}
+
+class MyContainerModule extends AbstractContainerModule
+{
+    public function build(ContainerBuilder $builder)
+    {
+        $builder->bind(IController::class)
+            ->to(Controller::class)
+            ->marked(new MyMarker());
+    }
+}
 
 /**
- * ***************************************************************************************************
+ *
+ * @author pgorbachev
+ *        
  */
-interface IValidator {
+class MyModule extends AbstractModule
+{
 
-    public function validate(IBaseController $a);
-}
-
-class OneValidator implements IValidator {
-
-    public $a = 'One validator';
-
-    public function validate(IBaseController $a) {
-        return $this->a;
+    public function getKey()
+    {
+        return 'MyModule';
     }
 
+    public function loadContainerModules(ContainerModuleLoader $loader)
+    {
+        $loader->registerModule(new MyContainerModule());
+    }    
 }
 
-class TwoValidator implements IValidator {
+Application::me()->registerModule(new MyModule());
+$app = Application::me();
 
-    public $a = 'Two validator';
+$a = $app(IController::class);
 
-    public function validate(IBaseController $a) {
-        return $this->a;
-    }
-
-}
-
-Application::me()->bind(IValidator::class);
-
-class PrizeController {
-
-    public function doOrderPrize(stdClass $request) {
-        // @TODO not implemented
-        $valid = Application::me()->get(IValidator::class)->validate(new Controller());
-    }
-
-}
-
-$pOrder = new PrizeController();
-$pOrder->doOrderPrize((object) []);
-
-
-
+var_dump($a);

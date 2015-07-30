@@ -4,23 +4,32 @@
  * @author pgorbachev
  *
  */
-final class InjectionPoint
+class InjectionPoint
 {
-	/**
-	 * 
-	 * @var string
-	 */
-	public $typeName;
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public $methodName;
+    protected $typeName;
+    
+    protected $methodName;
 	
 	
-	public function __construct($typeName)
+    public function __construct($typeName, $methodName)
 	{
 		$this->typeName = (string)$typeName;
+		$this->methodName = (string)$methodName;
+	}
+	
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getTypeName()
+	{
+	    return $this->typeName;
+	}
+	
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getMethodName()
+	{
+	    return $this->methodName;
 	}
 }

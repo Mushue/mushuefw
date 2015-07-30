@@ -12,18 +12,19 @@ class Application {
      * @var Container 
      */
     private $container;
+
     /**
      *
      * @var ContainerBuilder 
      */
     private $builder;
-    
+
     /**
      *
      * @var Configuration 
      */
     private $configuration;
-    
+
     /**
      *
      * @var Application 
@@ -45,7 +46,7 @@ class Application {
     public function getBuilder() {
         return $this->builder;
     }
-    
+
     /**
      * 
      * @return Application
@@ -59,7 +60,39 @@ class Application {
 
     public function __construct() {
         $this->builder = new ContainerBuilder();
+        $configLoader = new ConfigurationLoader();
+        $configLoader->registerLoader(new PhpConfigurationLoader());
         $this->configuration = new Configuration();
+    }
+
+    protected function loadConfigurationSources() {
+        $sources = [];
+        $dir = $this->getProjectDirectory() . DIRECTORY_SEPARATOR . 'config';
+        if (is_dir($dir)) {
+            foreach (new \DirectoryIterator($dir) as $entry) {
+                switch (strtolower($entry->getExtension())) {
+                    case 'php':
+                        $sources[] = new ConfigurationSource($entry, KernelInterface::CONFIG_PRIORITY);
+                }
+            }
+        }
+    }
+
+    protected function loadConfiguration() {
+        $sources = new \SplPriorityQueue();
+
+        $loader = new ConfigurationLoader();
+        $loader->registerLoader(new PhpConfigurationLoader());
+        $loader->registerLoader(new YamlConfigurationLoader());
+
+        $config = new Configuration();
+        $params = $this->getContainerParams();
+
+        foreach ($sources as $source) {
+            $config = $config->mergeWith($source->loadConfiguration($loader, $params));
+        }
+
+        return $config;
     }
 
     /**

@@ -4,6 +4,8 @@
  * Config
  */
 require_once 'src/Config/classes/Configuration.php';
+require_once 'src/Config/classes/ConfigurationLoader.php';
+require_once 'src/Config/interfaces/IConfigurationLoader.php';
 require_once 'src/Config/exceptions/ConfigurationMergeException.php';
 
 /**
